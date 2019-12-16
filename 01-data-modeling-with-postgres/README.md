@@ -71,7 +71,7 @@ running on port `80`.
 The Python setup requires Anaconda to be installed.
 To setup the Anaconda environment use:
 
-``bash
+```bash
 conda create -p ./.env python=3.7
 conda activate ./.env
 conda install --file requirements.txt
