@@ -1,0 +1,20 @@
+version: "3"
+services:
+  postgres:
+    image: "postgres:latest"
+    network_mode: host
+    environment:
+      POSTGRES_USER: "student"
+      POSTGRES_PASSWORD: "student"
+      POSTGRES_DB: "studentdb"
+    volumes:
+      - ./.db-data:/var/lib/postgres/data
+  pgadmin:
+    image: dpage/pgadmin4
+    network_mode: host
+    environment:
+      # Email and password are required for first login
+      PGADMIN_DEFAULT_EMAIL: 'student@udacity.com'
+      PGADMIN_DEFAULT_PASSWORD: 'student'
+    depends_on:
+      - postgres
