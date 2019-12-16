@@ -2,4 +2,6 @@
 *.swp
 __pycache__/
 .env/
+.pgadmin/
+.db-data/
 *.tgz
