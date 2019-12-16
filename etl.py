@@ -30,6 +30,8 @@ def process_song_file(cur, filepath):
 
     # insert song record
     song_cols = ["song_id", "title", "artist_id", "year", "duration"]
+    # Set year to None if it is 0. This will become a NULL value later in the DB.
+    df["year"] = df["year"].apply(lambda y: y if y > 0 else None)
     song_data = df[song_cols].values[0].tolist()
     cur.execute(song_table_insert, song_data)
 
@@ -41,6 +43,17 @@ def process_song_file(cur, filepath):
         "artist_latitude",
         "artist_longitude",
     ]
+
+    # Replace NaN values with None, which will later become NULL values in the database
+    nan_replacement = {pd.np.nan: None}
+    df[artist_cols] = df[artist_cols].replace(
+        dict(artist_latitude=nan_replacement, artist_longitude=nan_replacement)
+    )
+    # Replace empty location with None value, which will become NULL values in the
+    # database.
+    df["artist_location"] = df["artist_location"].apply(
+        lambda s: s if len(s) > 0 else None
+    )
     artist_data = df[artist_cols].values[0].tolist()
     cur.execute(artist_table_insert, artist_data)
 
