@@ -6,6 +6,15 @@ from sql_queries import *
 
 
 def process_song_file(cur, filepath):
+    """
+    Extract information from a song file and populate the two dimension tables `songs` and `artists`.
+    
+    This function implicitly depends on the SQL statements :func:`~sql_queries.song_table_insert`
+    and :func:`~sql_queries.artist_table_insert`.
+    
+    :param cur: Reference to the database cursor
+    :param filepath: Path to the JSON file
+    """
     # open song file
     df = pd.read_json(filepath, lines=True)
 
@@ -21,6 +30,16 @@ def process_song_file(cur, filepath):
 
 
 def process_log_file(cur, filepath):
+    """
+    Extract information from a log file and populate the dimension tables `time` and `users`
+    as well as the facts table `songplays`.
+    
+    This function implicitly depends on the SQL statements :func:`~sql_queries.time_table_insert`,
+    :func:`~sql_queries.user_table_insert` and :func:`~sql_queries.songplay_table_insert`.
+    
+    :param cur: Reference to the database cursor
+    :param filepath: Path to the JSON file
+    """
     # open log file
     df = pd.read_json(filepath, lines=True)
 
@@ -31,7 +50,15 @@ def process_log_file(cur, filepath):
     t = pd.to_datetime(df['ts'], unit='ms')
     
     # insert time data records
-    time_data = (df['ts'].values, t.dt.hour.values, t.dt.day.values, t.dt.week.values, t.dt.month.values, t.dt.year.values, t.dt.weekday.values)
+    time_data = (
+        df['ts'].values, 
+        t.dt.hour.values, 
+        t.dt.day.values, 
+        t.dt.week.values, 
+        t.dt.month.values, 
+        t.dt.year.values, 
+        t.dt.weekday.values
+    )
     column_labels = ('timestamp', 'hour', 'day', 'week', 'month', 'year', 'weekday')
     time_df = pd.DataFrame(dict(zip(column_labels, time_data)))
 
@@ -58,11 +85,30 @@ def process_log_file(cur, filepath):
             songid, artistid = None, None
 
         # insert songplay record
-        songplay_data = (row.ts, row.userId, row.level, songid, artistid, row.sessionId, row.location, row.userAgent)
+        songplay_data = (
+            row.ts, 
+            row.userId, 
+            row.level, 
+            songid, 
+            artistid, 
+            row.sessionId, 
+            row.location, 
+            row.userAgent
+        )
         cur.execute(songplay_table_insert, songplay_data)
 
 
 def process_data(cur, conn, filepath, func):
+    """
+    Recursively finds all JSON files in a given path and calls a function on the
+    found files.
+    
+    :param cur: Reference to the database cursor
+    :param conn: Reference to the database connection
+    :param filepath: Directory that should be recursively walked through
+    :param func: Function that should be called for each JSON file. 
+                 Arguments passed are the database cursor and the path to the JSON file.
+    """
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
@@ -82,6 +128,10 @@ def process_data(cur, conn, filepath, func):
 
 
 def main():
+    """
+    Main function that establishes a database connection to the PostgeSQL database
+    and processes data in the `data/song_data` and `data/log_data` folders.
+    """
     conn = psycopg2.connect("host=127.0.0.1 dbname=sparkifydb user=student password=student")
     cur = conn.cursor()
 
