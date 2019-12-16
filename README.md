@@ -14,6 +14,21 @@ this document.
 
 Data that should be extracted must live in the `data/` folder.
 
+## Overview
+
+```
+.
+├── create_tables.py       Script to create database and tables
+├── data/                  Folder that contains the raw data (e.g. logs)
+├── docker-compose.yaml    Docker environment (local development only)
+├── etl.ipynb              Jupyter Notebook that explains the ETL process
+├── etl.py                 ETL script based on the Jupyter Notebook
+├── README.md              This file
+├── requirements.txt       Python environment (local development only)
+├── sql_queries.py         Contains all raw SQL queries used in other files
+└── test.ipynb             Jupyter Notebook that can be used for ad-hoc db queries
+```
+
 ## Start ETL Pipeline
 
 To start the ETL pipeline first create the tables (if necessary) with
@@ -27,6 +42,12 @@ The ETL script can then be started using the `etl.py` file:
 ```bash
 python etl.py
 ```
+
+## Development
+
+The Jupyter Notebooks can be used for developing. `etl.ipynb` mirrors what happens
+in `etl.py` and contains most of the business logic.
+`test.ipynb` can be used to make ad-hoc queries against the database.
 
 ## Local development
 
