@@ -1,0 +1,5 @@
+.ipynb_checkpoints/
+*.swp
+__pycache__/
+*.tgz
+event_datafile_new.csv
