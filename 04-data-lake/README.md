@@ -13,6 +13,10 @@ Sparkify has created a dump of the data in Amazon S3 storage.
 This dump currently consists of JSON logs of the user activity and metadata
 on the songs.
 
+To improve analysis of the data, the data should be transformed into a star
+schema.
+The stored data should then be stored again on S3 for further usage.
+
 ## Solution
 
 We read the data from with (Py)Spark and transform it into a star schema.
@@ -37,7 +41,7 @@ conda activate ./.conda-env
 ```
 
 Then execute the `etl.py` script, which can either be executed in a local
-mode or the default (remote) mode:
+mode or the remote mode:
 
 Local mode:
 ```bash
@@ -54,5 +58,5 @@ python etl.py remote --help  # list all parameters
 python etl.py remote --s3-bucket-target s3a://your-bucket-id
 ```
 
-When running in the default mode, make sure to enter AWS credentials in the
+When running in remote mode, make sure to enter AWS credentials in the
 `dl.cfg` file first.
