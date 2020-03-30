@@ -84,7 +84,7 @@ def process_log_data(spark, input_data, output_data):
     :param output_data: Path to a folder or S3 bucket, where the output should be stored.
     """
     # get filepath to log data file
-    log_data = os.path.join(input_data, 'logdata', '*.json')
+    log_data = os.path.join(input_data, 'log_data', '*.json')
 
     # read log data file
     logger.debug(f"Read data from {log_data}")

@@ -1,5 +1,5 @@
 .ipynb_checkpoints/*
-data/logdata/
+data/log_data/
 data/song_data/
 output/
 spark-warehouse/

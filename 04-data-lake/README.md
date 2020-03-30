@@ -41,6 +41,9 @@ mode or the default (remote) mode:
 
 Local mode:
 ```bash
+# make sure to first unzip the sample data
+bash unzip_data.sh
+
 python etl.py local --help   # list all parameters
 python etl.py local          # runs the script in local mode (with default params)
 ```
