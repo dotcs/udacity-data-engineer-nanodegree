@@ -1,0 +1,5 @@
+.ipynb_checkpoints/*
+data/logdata/
+data/song_data/
+output/
+spark-warehouse/
