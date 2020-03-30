@@ -1,7 +1,7 @@
 # Udacity Data Engineer Nanodegree - Project 4: Data Lake
 
-In this project AWS Redshift is used as a Data Warehouse for a fictional
-music streaming service, which is called Sparkify.
+In this project (Py)Spark is used to process large amount of data for a
+fictional music streaming service, which is called Sparkify.
 
 ## Problem
 
@@ -39,11 +39,16 @@ conda activate ./.conda-env
 Then execute the `etl.py` script, which can either be executed in a local
 mode or the default (remote) mode:
 
+Local mode:
 ```bash
-python etl.py --local  # runs the script in local mode
-# or
-python etl.py # runs the script in default (remote) mode, in which data is
-              # read from and copied to S3 buckets
+python etl.py local --help   # list all parameters
+python etl.py local          # runs the script in local mode (with default params)
+```
+
+Remote mode:
+```bash
+python etl.py remote --help  # list all parameters
+python etl.py remote --s3-bucket-target s3a://your-bucket-id
 ```
 
 When running in the default mode, make sure to enter AWS credentials in the

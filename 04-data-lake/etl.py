@@ -187,6 +187,20 @@ def process_log_data(spark, input_data, output_data):
     songplays_table.write.parquet(songplays_table_fp, mode='overwrite', partitionBy=['year', 'month'])
 
 
+def _dir_path(string):
+    """
+    Method to test if a given path is a directory.
+    Idea from: https://stackoverflow.com/a/51212150
+
+    :param string: Potential directory path.
+    :raises NotADirectoryError: If given string is not a path to a directory
+    """
+    if os.path.isdir(string):
+        return string
+    else:
+        raise NotADirectoryError(string)
+
+
 def main():
     """
     Main program.
@@ -196,17 +210,53 @@ def main():
     logger.setLevel(logging.DEBUG)
 
     parser = argparse.ArgumentParser('ETL pipeline in Spark')
-    parser.add_argument('--local', action='store_true', help='If set local data is used, otherwise data is accessed from S3')
+    subparsers = parser.add_subparsers(dest="system")
+
+    local_parser = subparsers.add_parser("local")
+    local_parser.add_argument(
+        '--source-dir',
+        type=_dir_path,
+        default=os.path.join(os.path.dirname(__file__), 'data'),
+        help="Folder that contains the source files. Must be a local folder \
+(without tailing slash)."
+    )
+    local_parser.add_argument(
+        '--target-dir',
+        type=_dir_path,
+        default=os.path.join(os.path.dirname(__file__), 'output'),
+        help="Folder in which the processed data should be stored. Must be a \
+local folder (without tailing slash)."
+    )
+
+    remote_parser = subparsers.add_parser("remote")
+    remote_parser.add_argument(
+        '--s3-bucket-source',
+        default="s3a://udacity-dend",
+        help='Target bucket in which the processed data should be stored. \
+Must have the following form: s3a://my-bucket (without tailing slash).'
+    )
+    remote_parser.add_argument(
+        '--s3-bucket-target',
+        required=True,
+        help='Target bucket in which the processed data should be stored. \
+Must have the following form: s3a://my-bucket (without tailing slash).'
+    )
     cli_args = parser.parse_args()
+    logger.debug(f"CLI args: {cli_args}")
+
+    if cli_args.system == 'local':
+        input_data = cli_args.source_dir
+        output_data = cli_args.target_dir
+
+        os.makedirs(cli_args.target_dir, exist_ok=True)
+    else:
+        input_data = cli_args.s3_bucket_source
+        output_data = cli_args.s3_bucket_target
+
+    logger.debug(f"Input data: {input_data}")
+    logger.debug(f"Output data: {output_data}")
 
     spark = create_spark_session()
-    if cli_args.local:
-        input_data = cli_args.local_folder_input
-        output_data = cli_args.local_folder_output
-    else:
-        input_data = "s3a://udacity-dend"
-        output_data = "s3a://your-bucket-on-s3"
-    
     process_song_data(spark, input_data, output_data)    
     process_log_data(spark, input_data, output_data)
 
