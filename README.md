@@ -10,4 +10,5 @@ Please refer to the individual projects and their readme files.
 - [02 Data Modeling With Apache Cassandra](./02-data-modeling-with-apache-cassandra)
 - [03 Data Warehouse](./03-data-warehouse)
 - [04 Data Lake](./04-data-lake)
+- [05 Data Pipelines](./04-data-pipelines)
 
