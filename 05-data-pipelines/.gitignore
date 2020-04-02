@@ -1,0 +1,4 @@
+airflow/logs/
+airflow/airflow.cfg
+airflow/unittests.cfg
+airflow/*.pid
