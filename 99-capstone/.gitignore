@@ -1,0 +1,7 @@
+input/
+copy.sql
+__pycache__/
+*.pid
+*.db
+airflow/*.cfg
+airflow/logs/

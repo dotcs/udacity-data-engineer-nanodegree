@@ -11,4 +11,5 @@ Please refer to the individual projects and their readme files.
 - [03 Data Warehouse](./03-data-warehouse)
 - [04 Data Lake](./04-data-lake)
 - [05 Data Pipelines](./04-data-pipelines)
+- [99 Capstone Project](./99-capstone)
 
