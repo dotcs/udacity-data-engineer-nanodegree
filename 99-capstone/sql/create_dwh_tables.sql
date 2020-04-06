@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS fact_submission (
     "submission_id" text PRIMARY KEY sortkey,
-    "author_id" text,
+    "author_id" text NOT NULL,
+    "subreddit_id" text NOT NULL,
 
     "archived" boolean NULL,
     "can_gild" boolean NOT NULL,
@@ -10,13 +11,12 @@ CREATE TABLE IF NOT EXISTS fact_submission (
     "created" timestamp NOT NULL,
     "discussion_type" text NULL,
     "domain" text NOT NULL,
-    "edited" boolean NOT NULL,  -- needs to be transformed
-    "event_end" timestamp NULL,  -- take care of null
-    "event_is_live" boolean,  -- null needs to be transformed to false
+    "edited" boolean NOT NULL,     -- needs to be transformed
+    "event_end" timestamp NULL,    -- take care of null
+    "event_is_live" boolean,       -- null needs to be transformed to false
     "event_start" timestamp NULL,  -- take care of null
     "gilded" int NOT NULL,
     "hidden" boolean NOT NULL,
-    -- "id" text NOT NULL,
     "is_crosspostable" boolean NOT NULL,
     "is_meta" boolean NOT NULL,
     "is_original_content" boolean NOT NULL,
@@ -34,7 +34,6 @@ CREATE TABLE IF NOT EXISTS fact_submission (
     "post_hint" text NULL,
     "quarantine" boolean NOT NULL,
     "removal_reason" text NULL,
-    -- "retrieved_on" int,
     "score" int NOT NULL,
     "selftext" varchar(max) NOT NULL,
     "spoiler" boolean NOT NULL,
@@ -50,15 +49,17 @@ CREATE TABLE IF NOT EXISTS fact_submission (
 );
 
 CREATE TABLE IF NOT EXISTS dim_author (
-    "author_id" TEXT NOT NULL sortkey,
-    "fullname" TEXT,  -- only available in submission dataset
-    "created" TIMESTAMP NOT NULL,
-    "karma" INT -- only available in author dataset
+    "author_id" TEXT PRIMARY KEY sortkey,
+    "name" TEXT NOT NULL,
+    "created" TIMESTAMP NULL,
+    "karma_posts" INT NULL,
+    "karma_comments" INT NULL,
+    "karma" INT NULL,
+    "deleted" BOOLEAN NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS dim_subreddit (
-    "subreddit_id" text NOT NULL,
-
+    "subreddit_id" text PRIMARY KEY sortkey,
     "accounts_active" int NULL,
     "accounts_active_is_fuzzed" boolean NULL,
     "active_user_count" int NULL,
@@ -81,13 +82,12 @@ CREATE TABLE IF NOT EXISTS dim_subreddit (
     "header_img" varchar NULL,
     "header_title" varchar(max) NULL,
     "hide_ads" boolean NULL,
-    -- "id" varchar(max),
     "key_color" text NULL,
     "lang" text NULL,
     "name" text NOT NULL,
     "notification_level" text NULL,
     "original_content_tag_enabled" boolean NULL,
-    "over18" boolean NULL,
+    "over_18" boolean NULL,
     "primary_color" text NULL,
     "public_description" varchar(max) NULL,
     "public_traffic" boolean NULL,

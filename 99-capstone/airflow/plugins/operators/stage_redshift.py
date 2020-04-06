@@ -65,7 +65,13 @@ SECRET_ACCESS_KEY '{secret_access_key:}'
     def execute(self, context):
         aws_hook = AwsHook(self.aws_credentials_id)
         aws_credentials = aws_hook.get_credentials()
-        redshift_conn = PostgresHook(postgres_conn_id=self.redshift_conn_id)
+        redshift_conn = PostgresHook(
+            postgres_conn_id=self.redshift_conn_id,
+            connect_args={
+                'keepalives': 1, 
+                'keepalives_idle':60, 
+                'keepalives_interval': 60
+            })
 
         self.log.debug(f"Truncate table: {self.table}")
         redshift_conn.run(f"TRUNCATE TABLE {self.table}")

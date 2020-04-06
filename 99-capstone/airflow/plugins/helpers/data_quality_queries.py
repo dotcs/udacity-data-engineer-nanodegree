@@ -38,3 +38,25 @@ class DataQualityQueries:
     @staticmethod
     def col_does_not_contain_null_test(res):
         return res['count'][0] == 0
+
+    @staticmethod
+    def col_does_not_contain_str(table, col, val):
+        """
+        Tests if a given column has an entry with a given string.
+
+        :param table: Name of the table.
+        :param col: Name of the column.
+        :param val: Substring that should be checked.
+
+        :return: SQL statement that returns a single how many rows have been
+            found that contain the substr.
+        """
+        return """
+        SELECT COUNT({col:}) as count
+        FROM {table:}
+        WHERE "{col:}" like '%{val:}%'
+        """.format(**dict(table=table, col=col, val=val))
+
+    @staticmethod
+    def col_does_not_contain_str_test(res):
+        return res['count'][0] == 0

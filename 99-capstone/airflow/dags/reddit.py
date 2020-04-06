@@ -44,7 +44,7 @@ download_task = BashOperator(
 preprocess_author_task = BashOperator(
     dag=dag,
     task_id='preprocess_author',
-    bash_command=f'zstd -cdq {DATASET_DIR}/sample_1M/RA_78M.csv.zst | {BASH_SCRIPT_DIR}/preprocess_authors.py | zstd -zqfo {DATASET_DIR}/sample_1M/RA_78M_preprocessed.csv.zst',
+    bash_command=f'zstd -cdq {DATASET_DIR}/RA_78M.csv.zst | {BASH_SCRIPT_DIR}/preprocess_authors.py | zstd -zqfo {DATASET_DIR}/RA_78M_preprocessed.csv.zst',
 )
 
 sample_dataset_task = BashOperator(
@@ -75,7 +75,7 @@ stage_author_task = StageToRedshiftOperator(
 
     table='staging_authors',
     s3_src_bucket=S3_BUCKET_NAME,
-    s3_src_pattern='sample_1M/RA_78M_preprocessed.csv.zst',
+    s3_src_pattern='sample_2M/RA_78M_preprocessed.csv.zst',
     data_format='csv',
     delimiter='|',
     jsonpaths='auto',
@@ -91,7 +91,7 @@ stage_subreddits_task = StageToRedshiftOperator(
 
     table='staging_subreddits',
     s3_src_bucket=S3_BUCKET_NAME,
-    s3_src_pattern='sample_1M/Reddit_Subreddits.ndjson.zst',
+    s3_src_pattern='sample_2M/Reddit_Subreddits.ndjson.zst',
     data_format='json',
     jsonpaths='auto',
     copy_opts='ZSTD',
@@ -106,10 +106,10 @@ stage_submissions_task = StageToRedshiftOperator(
 
     table='staging_submissions',
     s3_src_bucket=S3_BUCKET_NAME,
-    s3_src_pattern='sample_1M/RS_2019-08.zst',
+    s3_src_pattern='sample_2M/RS_2019-08.zst',
     data_format='json',
     jsonpaths='auto',
-    copy_opts='ZSTD\nMAXERROR as 10',
+    copy_opts='ZSTD\nMAXERROR as 100',
 )
 stage_quality_task = DataQualityOperator(
     dag=dag,
@@ -157,7 +157,7 @@ fact_submission_task = LoadDWHTableOperator(
 
     table="fact_submission",
     sql_stmt=SqlQueries.fact_submission_insert,
-    update_mode='overwrite',
+    update_mode='append',
 )
 stage_time_task = LoadDWHTableOperator(
     dag=dag,
@@ -199,6 +199,8 @@ dwh_quality_task = DataQualityOperator(
         DataQualityQueries.col_does_not_contain_null('fact_submission', 'event_is_live'),
         DataQualityQueries.col_does_not_contain_null('fact_submission', 'suggested_sort'),
         DataQualityQueries.col_does_not_contain_null('fact_submission', 'whitelist_status'),
+
+        DataQualityQueries.col_does_not_contain_str('dim_author', 'author_id', ' '),
     ],
     test_results=[
         DataQualityQueries.table_not_empty_test,
@@ -214,6 +216,8 @@ dwh_quality_task = DataQualityOperator(
         DataQualityQueries.col_does_not_contain_null_test,
         DataQualityQueries.col_does_not_contain_null_test,
         DataQualityQueries.col_does_not_contain_null_test,
+
+        DataQualityQueries.col_does_not_contain_str_test,
     ],
 )
 

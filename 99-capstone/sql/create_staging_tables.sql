@@ -121,12 +121,13 @@ CREATE TABLE IF NOT EXISTS staging_subreddits (
 );
 
 CREATE TABLE IF NOT EXISTS staging_authors (
-  "id" int,
+  "id" bigint,
   "author" varchar(max),
   "created" int,
   "last_login" int,
-  "karma1" int,
-  "karma2" int
+  "karma_posts" int,
+  "karma_comments" int,
+  "author_valid" int
 );
 
 CREATE TABLE IF NOT EXISTS staging_times (

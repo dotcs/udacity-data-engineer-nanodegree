@@ -2,18 +2,28 @@ class SqlQueries:
     dim_author_insert = ("""
 INSERT INTO {table:} (
     "author_id",
-    "fullname",
+    "name",
     "created",
-    "karma"
+    "karma_posts",
+    "karma_comments",
+    "karma",
+    "deleted"
 )
 SELECT DISTINCT
+    LOWER(sa."author"),
     sa."author",
-    ss."author_fullname",
     TIMESTAMP 'epoch' + sa."created" * INTERVAL '1 second',
-    (sa."karma1" + sa."karma2")
+    sa."karma_posts",
+    sa."karma_comments",
+    (sa."karma_posts" + sa."karma_comments"),
+    CASE WHEN
+            (sa."created" IS NOT NULL
+            AND sa."karma_posts" IS NOT NULL
+            AND sa."karma_comments" IS NOT NULL)
+        THEN false ELSE true END
 FROM staging_authors sa
-LEFT JOIN staging_submissions ss
-    ON sa."author" = ss."author";""")
+WHERE sa."author_valid" = '1';
+""")
 
 
     dim_subreddit_insert = ("""
@@ -47,7 +57,7 @@ INSERT INTO {table:} (
     "name",
     "notification_level",
     "original_content_tag_enabled",
-    "over18",
+    "over_18",
     "primary_color",
     "public_description",
     "public_traffic",
@@ -70,7 +80,7 @@ INSERT INTO {table:} (
     "wls"
 )
 SELECT DISTINCT
-    sr."id",
+    LOWER(sr."display_name"),
 
     sr."accounts_active",
     sr."accounts_active_is_fuzzed",
@@ -127,6 +137,7 @@ FROM staging_subreddits sr;""")
 INSERT INTO fact_submission (
     "submission_id",
     "author_id",
+    "subreddit_id",
 
     "archived",
     "can_gild",
@@ -174,7 +185,8 @@ INSERT INTO fact_submission (
 )
 SELECT DISTINCT
     ss."id",
-    ss."author",
+    LOWER(ss."author"),
+    LOWER(ss."subreddit"),
 
     ss."archived",
     ss."can_gild",
@@ -227,7 +239,9 @@ FROM staging_submissions ss;""")
 
     staging_times_insert = ("""
 INSERT INTO {table:} ( "start_time")
-SELECT DISTINCT created FROM dim_author;
+SELECT DISTINCT created
+    FROM dim_author
+    WHERE created IS NOT NULL;
 
 INSERT INTO {table:} ( "start_time")
 SELECT DISTINCT created FROM dim_subreddit;
